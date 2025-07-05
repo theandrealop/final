@@ -6,10 +6,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // output: 'export', // <- Rimuovi questa riga
+  output: 'export',
   trailingSlash: true,
   images: {
-    // unoptimized: true, // <- Rimuovi anche questa se rimuovi output: export
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -19,27 +19,6 @@ const nextConfig = {
       },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, PUT, DELETE, OPTIONS',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization',
-          },
-        ],
-      },
-    ]
-  },
+  // Rimuovi la sezione headers() perché non funziona con export
 }
-
 export default nextConfig
