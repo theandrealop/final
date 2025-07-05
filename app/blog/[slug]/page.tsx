@@ -4,11 +4,53 @@ import { getPostBySlug, getRelatedPosts } from '@/lib/graphql-api'
 import { Metadata } from 'next'
 import { BlogPostContent } from '@/components/blog-post-content'
 
-// Awaiting params per Next.js 15
+// ✅ AGGIUNGI QUESTA FUNZIONE
+export async function generateStaticParams() {
+  try {
+    // Qui devi recuperare tutti gli slug dei tuoi post
+    // Opzione 1: Se hai una funzione getAllPosts()
+    // const posts = await getAllPosts()
+    // return posts.map((post: any) => ({ slug: post.slug }))
+    
+    // Opzione 2: Query GraphQL diretta
+    const query = `
+      query GetAllPosts {
+        posts(first: 100) {
+          nodes {
+            slug
+          }
+        }
+      }
+    `
+    
+    const response = await fetch('https://pff-815f04.ingress-florina.ewp.live/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query }),
+    })
+    
+    const data = await response.json()
+    
+    if (data.data?.posts?.nodes) {
+      return data.data.posts.nodes.map((post: any) => ({
+        slug: post.slug,
+      }))
+    }
+    
+    return []
+  } catch (error) {
+    console.error('Error generating static params:', error)
+    return []
+  }
+}
+
+// Resto del tuo codice esistente...
 async function BlogPostPageContent({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const post = await getPostBySlug(slug)
-
+  
   if (!post) {
     notFound()
   }
@@ -40,11 +82,10 @@ async function BlogPostPageContent({ params }: { params: Promise<{ slug: string 
   )
 }
 
-// FIX 2: Awaiting params nella funzione generateMetadata
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params  // ✅ Await params prima di usarlo
-  const post = await getPostBySlug(slug)  // ✅ Ora possiamo usare slug
-
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
+  
   if (!post) {
     return {
       title: 'Post non trovato',
