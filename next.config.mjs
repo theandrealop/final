@@ -6,10 +6,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'export',
+  // output: 'export', // <- Rimuovi questa riga
   trailingSlash: true,
   images: {
-    unoptimized: true,
+    // unoptimized: true, // <- Rimuovi anche questa se rimuovi output: export
     remotePatterns: [
       {
         protocol: 'https',
