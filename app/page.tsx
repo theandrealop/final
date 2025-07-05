@@ -148,33 +148,23 @@ export default function PuntiFurbiHomepage() {
             {/* Left Content */}
             <div className="space-y-8 animate-fade-in-up">
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 px-6 py-3 rounded-full text-lg font-semibold bg-light-green text-dark-green animate-bounce-in">
-                <div className="flex -space-x-1">
-                  <img
-                    src="https://images.pexels.com/photos/32811796/pexels-photo-32811796.jpeg"
-                    alt="user 1"
-                    className="w-8 h-8 rounded-full border-2 border-white object-cover object-center"
-                  />
-                  <img
-                    src="https://images.pexels.com/photos/32821272/pexels-photo-32821272.jpeg"
-                    alt="user 2"
-                    className="w-8 h-8 rounded-full border-2 border-white object-cover object-center"
-                  />
-                  <img
-                    src="https://images.pexels.com/photos/32784426/pexels-photo-32784426.jpeg"
-                    alt="user 3"
-                    className="w-8 h-8 rounded-full border-2 border-white object-cover object-center"
-                  />
-                </div>
-                <span className="text-lg font-semibold">Amato da 20k+</span>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <span className="text-lg font-semibold">valutazione</span>
-              </div>
-
+              <div className="inline-flex items-center px-6 py-3 rounded-full bg-light-green text-dark-green animate-bounce-in">
+  <div className="flex -space-x-3">
+    <img ... />
+    <img ... />
+    <img ... />
+  </div>
+  <div className="flex flex-col justify-center ml-4 mr-4">
+    <span className="text-lg font-semibold leading-tight">Amato</span>
+    <span className="text-lg font-semibold leading-tight">da 20k+</span>
+  </div>
+  <div className="flex items-center">
+    {[...Array(5)].map((_, i) => (
+      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+    ))}
+    <span className="ml-2 text-lg font-semibold">valutazione</span>
+  </div>
+</div>
               {/* Headline */}
               <div className="space-y-2 animate-fade-in-up animation-delay-200">
                 <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight font-pp-mori mb-6 lg:mb-8 text-center md:text-left">
