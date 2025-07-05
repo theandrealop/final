@@ -149,33 +149,33 @@ export default function PuntiFurbiHomepage() {
             <div className="space-y-8 animate-fade-in-up">
               {/* Badge */}
 
-<div className="inline-flex items-center px-6 py-3 rounded-full bg-light-green text-dark-green animate-bounce-in">
-  <div className="flex -space-x-3">
+<div className="inline-flex items-center px-3 sm:px-6 py-3 rounded-full bg-light-green text-dark-green animate-bounce-in">
+  <div className="flex -space-x-3 flex-shrink-0">
     <img 
       src="https://i.imgur.com/mR4OFJ6.jpeg" 
       alt="User 1" 
-      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white object-cover"
     />
     <img 
       src="https://i.imgur.com/Z3VfOYP.jpeg" 
       alt="User 2" 
-      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white object-cover"
     />
     <img 
       src="https://us.123rf.com/450wm/satura86/satura861708/satura86170801548/84040788-coppia-di-turisti-prendendo-selfie-sulla-spiaggia-concetto-di-vacanza-amore-viaggi-e-vacanze.jpg" 
       alt="User 3" 
-      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+      className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white object-cover"
     />
   </div>
-  <div className="flex flex-col justify-center ml-4 mr-4">
-    <span className="text-lg font-semibold leading-tight">Amato</span>
-    <span className="text-lg font-semibold leading-tight">da 20k+</span>
+  <div className="flex flex-col justify-center ml-3 sm:ml-4 mr-2 sm:mr-4 flex-shrink-0">
+    <span className="text-sm sm:text-lg font-semibold leading-tight">Amato</span>
+    <span className="text-sm sm:text-lg font-semibold leading-tight">da 20k+</span>
   </div>
   <div className="flex items-center">
     {[...Array(5)].map((_, i) => (
-      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+      <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
     ))}
-    <span className="ml-2 text-lg font-semibold">valutazione</span>
+    <span className="ml-1 sm:ml-2 text-sm sm:text-lg font-semibold">valutazione</span>
   </div>
 </div>
               {/* Headline */}
