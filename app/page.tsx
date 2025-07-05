@@ -148,11 +148,24 @@ export default function PuntiFurbiHomepage() {
             {/* Left Content */}
             <div className="space-y-8 animate-fade-in-up">
               {/* Badge */}
-              <div className="inline-flex items-center px-6 py-3 rounded-full bg-light-green text-dark-green animate-bounce-in">
+
+<div className="inline-flex items-center px-6 py-3 rounded-full bg-light-green text-dark-green animate-bounce-in">
   <div className="flex -space-x-3">
-    <img ... />
-    <img ... />
-    <img ... />
+    <img 
+      src="https://i.imgur.com/mR4OFJ6.jpeg" 
+      alt="User 1" 
+      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+    />
+    <img 
+      src="https://i.imgur.com/Z3VfOYP.jpeg" 
+      alt="User 2" 
+      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+    />
+    <img 
+      src="https://us.123rf.com/450wm/satura86/satura861708/satura86170801548/84040788-coppia-di-turisti-prendendo-selfie-sulla-spiaggia-concetto-di-vacanza-amore-viaggi-e-vacanze.jpg" 
+      alt="User 3" 
+      className="w-8 h-8 rounded-full border-2 border-white object-cover"
+    />
   </div>
   <div className="flex flex-col justify-center ml-4 mr-4">
     <span className="text-lg font-semibold leading-tight">Amato</span>
