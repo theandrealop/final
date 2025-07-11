@@ -17,8 +17,16 @@ const nextConfig = {
         port: '',
         pathname: '/wp-content/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
-  // Rimuovi la sezione headers() perché non funziona con export
+  // Note: Redirects don't work with static export
+  // For static deployment, handle redirects at the hosting provider level
+  // or use client-side redirects if needed
 }
 export default nextConfig

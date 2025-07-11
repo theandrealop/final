@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://puntifurbi.com/sitemap.xml
+
+# Disallow admin pages if they exist
+Disallow: /admin/
+Disallow: /api/
+
+# Allow important pages
+Allow: /voli-economici/
+Allow: /blog/
+Allow: /come-funziona/
+Allow: /premium/
+Allow: /elite/

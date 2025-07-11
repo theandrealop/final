@@ -5,6 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { SiteNavigation } from "@/components/site-navigation"
+import { GoogleAnalytics } from "@/components/google-analytics"
+import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,13 +25,13 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://puntifurbi.com"),
   alternates: {
-    canonical: "/",
+    canonical: "https://puntifurbi.com/",
   },
   openGraph: {
     title: "Punti Furbi - Risparmia fino al 90% sui voli",
     description:
       "Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive.",
-    url: "https://puntifurbi.com",
+    url: "https://puntifurbi.com/",
     siteName: "Punti Furbi",
     locale: "it_IT",
     type: "website",
@@ -52,7 +54,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -62,6 +64,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" suppressHydrationWarning>
+      <head>
+        <GoogleAnalytics />
+        <OrganizationSchema
+          name="Punti Furbi"
+          url="https://puntifurbi.com"
+          logo="https://puntifurbi.com/placeholder-logo.png"
+          socialLinks={[
+            "https://facebook.com/puntifurbi",
+            "https://twitter.com/puntifurbi",
+            "https://instagram.com/puntifurbi"
+          ]}
+        />
+        <WebsiteSchema
+          name="Punti Furbi"
+          url="https://puntifurbi.com"
+          description="Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive."
+        />
+      </head>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           <SiteNavigation />

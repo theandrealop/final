@@ -1,0 +1,34 @@
+# Handle trailing slashes for consistency and SEO
+RewriteEngine On
+
+# Redirect non-trailing slash to trailing slash
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !(.*)/$
+RewriteRule ^(.*)$ $1/ [L,R=301]
+
+# Handle specific page redirects
+RewriteRule ^voli-economici$ /voli-economici/ [R=301,L]
+RewriteRule ^blog$ /blog/ [R=301,L]
+RewriteRule ^come-funziona$ /come-funziona/ [R=301,L]
+RewriteRule ^premium$ /premium/ [R=301,L]
+RewriteRule ^elite$ /elite/ [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Cache optimization
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
