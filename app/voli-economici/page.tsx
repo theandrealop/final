@@ -6,6 +6,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { NewsletterPopup } from "@/components/newsletter-popup"
 
+export default function VoliEconomiciPage() {
+
 // Manual offers data - no database needed
 const manualOffers = [
   {
@@ -78,11 +80,10 @@ const manualOffers = [
   
 ]
 
-export default function VoliEconomiciPage() {
+  const [showNewsletterPopup, setShowNewsletterPopup] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentOfferIndex, setCurrentOfferIndex] = useState(0)
   const [selectedAirport, setSelectedAirport] = useState("Roma")
-  const [showNewsletterPopup, setShowNewsletterPopup] = useState(false)
 
   // Filter offers based on selected airport
   const filteredOffers = manualOffers.filter((offer) => offer.origin === selectedAirport)
@@ -486,3 +487,5 @@ export default function VoliEconomiciPage() {
     </div>
   )
 }
+
+
