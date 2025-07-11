@@ -78,31 +78,31 @@ export default function PremiumPage() {
           <div className="bg-white rounded-2xl shadow-xl p-8 border-4 border-[#483cff]">
             <div className="flex items-center justify-center mb-6">
               <Crown className="text-[#483cff] mr-2" size={32} />
-              <h3 className="text-2xl font-bold text-dark-green">🟨 Premium</h3>
+              <h3 className="text-2xl font-bold text-dark-green">Premium</h3>
             </div>
             <div className="text-center mb-8">
               <div className="text-5xl font-bold text-[#483cff] mb-2">€4,90</div>
               <div className="text-gray-600">al mese / €99 all'anno</div>
             </div>
-            <ul className="space-y-4 mb-8">
+            <ul className="space-y-4 mb-8 text-left">
               <li className="flex items-center">
-                <Check className="text-green-500 mr-3" size={20} />
+                <Check className="text-green-500 mr-3 flex-shrink-0" size={20} />
                 <span>Tutte le offerte Economy e Premium Economy</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-500 mr-3" size={20} />
+                <Check className="text-green-500 mr-3 flex-shrink-0" size={20} />
                 <span>Offerte esclusive in Business e First Class</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-500 mr-3" size={20} />
+                <Check className="text-green-500 mr-3 flex-shrink-0" size={20} />
                 <span>Segnalazioni di tariffe error fare premium</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-500 mr-3" size={20} />
+                <Check className="text-green-500 mr-3 flex-shrink-0" size={20} />
                 <span>Supporto via email prioritario</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-500 mr-3" size={20} />
+                <Check className="text-green-500 mr-3 flex-shrink-0" size={20} />
                 <span>Accesso a offerte riservate</span>
               </li>
             </ul>
