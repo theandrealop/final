@@ -74,32 +74,32 @@ export default function ElitePage() {
           <div className="bg-gradient-to-br from-[#483cff] to-purple-600 rounded-2xl shadow-2xl p-8 text-white">
             <div className="flex items-center justify-center mb-6">
               <Zap className="text-white mr-2" size={32} />
-              <h3 className="text-2xl font-bold">🟦 Elite</h3>
+              <h3 className="text-2xl font-bold">Elite</h3>
             </div>
             <div className="text-center mb-8">
               <div className="text-5xl font-bold mb-2">€19,90</div>
               <div className="text-purple-200">al mese / €199 all'anno</div>
             </div>
-            <ul className="space-y-4 mb-8">
+            <ul className="space-y-4 mb-8 text-left">
               <li className="flex items-center">
-                <Check className="text-green-400 mr-3" size={20} />
-                <span>Tutto il piano Premium</span>
+                <Check className="text-green-400 mr-3 flex-shrink-0" size={20} />
+                <span className="text-left">Tutto il piano Premium</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-400 mr-3" size={20} />
-                <span>Ricerca personalizzata con punti e miglia</span>
+                <Check className="text-green-400 mr-3 flex-shrink-0" size={20} />
+                <span className="text-left">Ricerca personalizzata con punti e miglia</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-400 mr-3" size={20} />
-                <span>1 consulenza personalizzata al mese</span>
+                <Check className="text-green-400 mr-3 flex-shrink-0" size={20} />
+                <span className="text-left">1 consulenza personalizzata al mese</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-400 mr-3" size={20} />
-                <span>Accesso anticipato a tutte le offerte</span>
+                <Check className="text-green-400 mr-3 flex-shrink-0" size={20} />
+                <span className="text-left">Accesso anticipato a tutte le offerte</span>
               </li>
               <li className="flex items-center">
-                <Check className="text-green-400 mr-3" size={20} />
-                <span>Consigli su status, carte e strategie travel hacking</span>
+                <Check className="text-green-400 mr-3 flex-shrink-0" size={20} />
+                <span className="text-left">Consigli su status, carte e strategie travel hacking</span>
               </li>
             </ul>
             <button className="w-full px-8 py-4 text-lg rounded-full bg-white text-[#483cff] font-semibold hover:bg-gray-100 transition-colors shadow-lg">
