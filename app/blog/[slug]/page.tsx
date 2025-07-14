@@ -6,38 +6,9 @@ import { BlogPostContent } from '@/components/blog-post-content'
 
 // Genera i parametri statici per il build
 export async function generateStaticParams() {
-  try {
-    console.log('📦 Generating static params for blog posts...')
-    
-    // Usa la funzione getAllPosts esistente che ha migliore error handling
-    const { posts } = await getAllPosts(100) // Prendiamo i primi 100 post
-    
-    console.log(`📦 Found ${posts.length} posts for static generation`)
-    
-    if (posts.length > 0) {
-      const params = posts.map((post) => ({
-        slug: post.slug,
-      }))
-      
-      console.log('📦 Generated params:', params.map(p => p.slug).join(', '))
-      return params
-    }
-    
-    // Se non ci sono post dall'API, fallback a parametri di esempio
-    console.log('📦 No posts found from API, using fallback params')
-    return [
-      { slug: 'esempio-post' },
-    ]
-  } catch (error) {
-    console.error('❌ Error generating static params:', error)
-    
-    // Se la chiamata API fallisce durante il build, usa parametri di fallback
-    // Questo permette al build di completarsi anche se WordPress è offline
-    console.log('📦 API unreachable, using fallback params for build')
-    return [
-      { slug: 'esempio-post' },
-    ]
-  }
+  // Ritorna array vuoto per permettere generazione dinamica
+  // Le pagine saranno generate on-demand
+  return []
 }
 
 // Resto del tuo codice esistente...

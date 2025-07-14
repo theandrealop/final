@@ -112,7 +112,7 @@ async function fetchGraphQL(query: string, variables: any = {}) {
         query,
         variables,
       }),
-      next: { revalidate: 300 }, // Cache for 5 minutes
+      next: { revalidate: 60 }, // Cache for 1 minute
     })
 
     console.log("📡 Response status:", response.status)
