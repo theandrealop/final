@@ -390,13 +390,13 @@ const manualOffers = [
               {/* Navigation */}
               <button
                 onClick={prevOffer}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                className="slideshow-nav-button absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
               >
                 <ChevronLeft size={24} className="text-dark-green" />
               </button>
               <button
                 onClick={nextOffer}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                className="slideshow-nav-button absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
               >
                 <ChevronRight size={24} className="text-dark-green" />
               </button>

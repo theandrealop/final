@@ -14,6 +14,14 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
     })
   }
 
+  // Function to process HTML content and add target="_blank" to all links
+  const processContentLinks = (htmlContent: string) => {
+    return htmlContent.replace(
+      /<a([^>]*?)>/g, 
+      '<a$1 target="_blank" rel="noopener noreferrer">'
+    )
+  }
+
   return (
     <article className="max-w-4xl mx-auto">
       {/* Featured Image */}
@@ -47,7 +55,7 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
       </div>
 
       {/* Content */}
-      <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: processContentLinks(post.content) }} />
 
       {/* Tags */}
       {post.tags.nodes.length > 0 && (
