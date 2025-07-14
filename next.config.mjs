@@ -6,7 +6,8 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'export',
+  // Temporarily comment out export for blog dynamic pages
+  // output: 'export',
   trailingSlash: true,
   images: {
     unoptimized: true,

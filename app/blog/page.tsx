@@ -90,9 +90,4 @@ export default function BlogPage() {
 export const metadata = {
   title: "Blog - Punti Furbi",
   description: "Scopri i nostri articoli su viaggi, punti fedeltà e offerte esclusive.",
-  other: {
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0'
-  }
 }
