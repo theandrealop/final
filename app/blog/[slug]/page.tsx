@@ -6,9 +6,17 @@ import { BlogPostContent } from '@/components/blog-post-content'
 
 // Genera i parametri statici per il build
 export async function generateStaticParams() {
-  // Ritorna array vuoto per permettere generazione dinamica
-  // Le pagine saranno generate on-demand
-  return []
+  try {
+    // Ottieni tutti i post per la generazione statica
+    const posts = await getAllPosts(1000) // Ottieni fino a 1000 post
+    return posts.posts.map((post) => ({
+      slug: post.slug,
+    }))
+  } catch (error) {
+    console.error('Error generating static params for blog posts:', error)
+    // In caso di errore, ritorna array vuoto per evitare che il build fallisca
+    return []
+  }
 }
 
 // Resto del tuo codice esistente...
