@@ -26,8 +26,67 @@ export function BlogList({
 
     setLoading(true)
     try {
-      // For now, just disable load more since we're having API issues
-      setHasNextPage(false)
+      // Client-side GraphQL fetch without Next.js specific options
+      const WORDPRESS_API_URL = "https://pff-815f04.ingress-florina.ewp.live/graphql"
+      
+      const query = `
+        query GetAllPosts($first: Int!, $after: String) {
+          posts(first: $first, after: $after, where: { status: PUBLISH }) {
+            nodes {
+              id
+              title
+              slug
+              excerpt
+              date
+              author { node { name } }
+              categories { nodes { name slug } }
+              featuredImage { node { sourceUrl altText } }
+            }
+            pageInfo {
+              hasNextPage
+              endCursor
+            }
+          }
+        }
+      `
+
+      const response = await fetch(WORDPRESS_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query,
+          variables: { first: 12, after: endCursor }
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const json = await response.json()
+      
+      if (json.errors) {
+        throw new Error("GraphQL query failed: " + JSON.stringify(json.errors))
+      }
+
+      const data = json.data
+      
+      // Sort new posts by date (most recent first)
+      const newPosts = (data.posts.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      })
+      
+      setPosts((prevPosts: BlogPost[]) => {
+        const combined = [...prevPosts, ...newPosts]
+        // Re-sort the entire array to maintain order
+        return combined.sort((a: BlogPost, b: BlogPost) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime()
+        })
+      })
+      setHasNextPage(data.posts.pageInfo?.hasNextPage || false)
+      setEndCursor(data.posts.pageInfo?.endCursor || null)
     } catch (error) {
       console.error("Error loading more posts:", error)
     } finally {

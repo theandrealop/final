@@ -87,8 +87,13 @@ export async function getAllPosts(first = 10, after?: string): Promise<Paginated
     }
   }
 
+  // Sort posts by date (most recent first) on client side
+  const posts = (data.posts.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime()
+  })
+
   return {
-    posts: data.posts.nodes || [],
+    posts,
     hasNextPage: data.posts.pageInfo?.hasNextPage || false,
     endCursor: data.posts.pageInfo?.endCursor || null,
   }
@@ -167,7 +172,11 @@ export async function getBlogPosts(first = 10): Promise<BlogPost[]> {
 
   try {
     const data = await fetchGraphQL(query, { first })
-    return data?.posts?.nodes || []
+    // Sort posts by date (most recent first) on client side
+    const posts = (data?.posts?.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+    return posts
   } catch (error) {
     console.error("Error fetching blog posts:", error)
     return []
@@ -233,7 +242,7 @@ export async function getRelatedPosts(categories: any[]): Promise<any[]> {
     return []
   }
 
-  // FIX: Query GraphQL corretta per WordPress
+  // FIX: Query GraphQL corretta per WordPress con ordinamento per data
   const query = `
     query GetRelatedPosts($categoryId: ID!) {
       category(id: $categoryId) {
