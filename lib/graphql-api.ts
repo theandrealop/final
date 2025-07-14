@@ -122,10 +122,28 @@ async function fetchGraphQL(query: string, variables: any = {}) {
 
     if (!response.ok) {
       console.error("❌ HTTP error! status:", response.status)
+      // Try to get the response text to see what we received
+      const text = await response.text()
+      console.error("❌ Response body:", text.substring(0, 200) + "...")
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const json = await response.json()
+    const text = await response.text()
+    
+    // Check if response is HTML (error page) instead of JSON
+    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+      console.error("❌ Received HTML instead of JSON:", text.substring(0, 200) + "...")
+      throw new Error("GraphQL endpoint returned HTML instead of JSON - check your WordPress API URL")
+    }
+
+    let json
+    try {
+      json = JSON.parse(text)
+    } catch (parseError) {
+      console.error("❌ JSON parse error:", parseError)
+      console.error("❌ Raw response:", text.substring(0, 200) + "...")
+      throw new Error("Invalid JSON response from GraphQL endpoint")
+    }
     
     console.log("📄 Response received:", json.data ? "✅ Data found" : "❌ No data")
 
