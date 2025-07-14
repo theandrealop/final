@@ -1,48 +1,42 @@
 // app/blog/[slug]/page.tsx
 import { notFound } from 'next/navigation'
-import { getPostBySlug, getRelatedPosts } from '@/lib/graphql-api'
+import { getPostBySlug, getRelatedPosts, getAllPosts } from '@/lib/graphql-api'
 import { Metadata } from 'next'
 import { BlogPostContent } from '@/components/blog-post-content'
 
-// ✅ AGGIUNGI QUESTA FUNZIONE
+// Genera i parametri statici per il build
 export async function generateStaticParams() {
   try {
-    // Qui devi recuperare tutti gli slug dei tuoi post
-    // Opzione 1: Se hai una funzione getAllPosts()
-    // const posts = await getAllPosts()
-    // return posts.map((post: any) => ({ slug: post.slug }))
+    console.log('📦 Generating static params for blog posts...')
     
-    // Opzione 2: Query GraphQL diretta
-    const query = `
-      query GetAllPosts {
-        posts(first: 100) {
-          nodes {
-            slug
-          }
-        }
-      }
-    `
+    // Usa la funzione getAllPosts esistente che ha migliore error handling
+    const { posts } = await getAllPosts(100) // Prendiamo i primi 100 post
     
-    const response = await fetch('https://pff-815f04.ingress-florina.ewp.live/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query }),
-    })
+    console.log(`📦 Found ${posts.length} posts for static generation`)
     
-    const data = await response.json()
-    
-    if (data.data?.posts?.nodes) {
-      return data.data.posts.nodes.map((post: any) => ({
+    if (posts.length > 0) {
+      const params = posts.map((post) => ({
         slug: post.slug,
       }))
+      
+      console.log('📦 Generated params:', params.map(p => p.slug).join(', '))
+      return params
     }
     
-    return []
+    // Se non ci sono post dall'API, fallback a parametri di esempio
+    console.log('📦 No posts found from API, using fallback params')
+    return [
+      { slug: 'esempio-post' },
+    ]
   } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
+    console.error('❌ Error generating static params:', error)
+    
+    // Se la chiamata API fallisce durante il build, usa parametri di fallback
+    // Questo permette al build di completarsi anche se WordPress è offline
+    console.log('📦 API unreachable, using fallback params for build')
+    return [
+      { slug: 'esempio-post' },
+    ]
   }
 }
 
