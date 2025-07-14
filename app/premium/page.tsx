@@ -106,9 +106,14 @@ export default function PremiumPage() {
                 <span className="text-left">Accesso a offerte riservate</span>
               </li>
             </ul>
-            <button className="w-full px-8 py-4 text-lg rounded-full bg-[#483cff] text-white font-semibold hover:opacity-90 transition-opacity shadow-lg">
+            <a 
+              href="https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full px-8 py-4 text-lg rounded-full bg-[#483cff] text-white font-semibold hover:opacity-90 transition-opacity shadow-lg inline-block text-center"
+            >
               Passa a Premium
-            </button>
+            </a>
           </div>
         </div>
       </section>

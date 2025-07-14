@@ -107,12 +107,15 @@ async function fetchGraphQL(query: string, variables: any = {}) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
       },
       body: JSON.stringify({
         query,
         variables,
       }),
-      next: { revalidate: 300 }, // Cache for 5 minutes
+      next: { revalidate: 60 }, // Cache for 1 minute - faster updates for new posts
     })
 
     console.log("📡 Response status:", response.status)

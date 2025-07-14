@@ -102,9 +102,14 @@ export default function ElitePage() {
                 <span className="text-left">Consigli su status, carte e strategie travel hacking</span>
               </li>
             </ul>
-            <button className="w-full px-8 py-4 text-lg rounded-full bg-white text-[#483cff] font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+            <a 
+              href="https://buy.stripe.com/28EdRachK3xI1PC2b19AA02" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full px-8 py-4 text-lg rounded-full bg-white text-[#483cff] font-semibold hover:bg-gray-100 transition-colors shadow-lg inline-block text-center"
+            >
               Diventa Elite
-            </button>
+            </a>
           </div>
         </div>
       </section>
