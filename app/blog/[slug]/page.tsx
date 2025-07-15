@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getPostBySlug, getRelatedPosts, getAllPosts } from '@/lib/graphql-api'
 import { Metadata } from 'next'
 import { BlogPostContent } from '@/components/blog-post-content'
+import { generateVersionHash, getCurrentVersion, addCacheBustingParams } from '@/lib/cache-busting'
 
 // Genera i parametri statici per il build
 export async function generateStaticParams() {
@@ -37,6 +38,14 @@ async function BlogPostPageContent({ params }: { params: Promise<{ slug: string 
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Cache busting meta tags specifici per l'articolo */}
+      <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+      <meta httpEquiv="Pragma" content="no-cache" />
+      <meta httpEquiv="Expires" content="0" />
+      <meta name="article-version" content={generateVersionHash(post.content)} />
+      <meta name="article-modified" content={post.modifiedDate || new Date().toISOString()} />
+      <meta name="cache-bust" content={Date.now().toString()} />
+      
       <BlogPostContent post={post} />
       {relatedPosts.length > 0 && (
         <div className="mt-12">
@@ -46,6 +55,12 @@ async function BlogPostPageContent({ params }: { params: Promise<{ slug: string 
               <div key={relatedPost.id} className="border rounded-lg p-4">
                 <h3 className="font-semibold mb-2">{relatedPost.title}</h3>
                 <p className="text-gray-600 text-sm">{relatedPost.excerpt}</p>
+                <a 
+                  href={addCacheBustingParams(`/blog/${relatedPost.slug}/`)}
+                  className="text-blue-600 hover:underline"
+                >
+                  Leggi di più
+                </a>
               </div>
             ))}
           </div>
@@ -62,9 +77,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!post) {
     return {
       title: 'Post non trovato',
-      description: 'Il post richiesto non esiste.'
+      description: 'Il post richiesto non esiste.',
+      other: {
+        'cache-control': 'no-cache, no-store, must-revalidate',
+        'pragma': 'no-cache',
+        'expires': '0',
+      },
     }
   }
+
+  const articleVersion = generateVersionHash(post.content)
+  const lastModified = post.modifiedDate || new Date().toISOString()
 
   return {
     title: post.title,
@@ -73,6 +96,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: post.title,
       description: post.excerpt || post.title,
       images: post.featuredImage ? [post.featuredImage.node.sourceUrl] : [],
+      modifiedTime: lastModified,
+    },
+    // Cache busting metadata
+    other: {
+      'cache-control': 'no-cache, no-store, must-revalidate',
+      'pragma': 'no-cache',
+      'expires': '0',
+      'version': getCurrentVersion(),
+      'article-version': articleVersion,
+      'last-modified': lastModified,
+      'cache-bust': Date.now().toString(),
     },
   }
 }

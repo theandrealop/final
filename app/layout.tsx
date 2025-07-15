@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { SiteNavigation } from "@/components/site-navigation"
 import { GoogleAnalytics } from "@/components/google-analytics"
 import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data"
+import { ClientCacheBuster, DynamicBlogMetaTags } from "@/components/client-cache-buster"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -50,6 +51,14 @@ export const metadata: Metadata = {
     siteName: "Punti Furbi",
     locale: "it_IT",
     type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Punti Furbi - Risparmia sui voli",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -57,6 +66,7 @@ export const metadata: Metadata = {
     description:
       "Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!",
     creator: "@puntifurbi",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -69,7 +79,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  generator: 'v0.dev'
+  verification: {
+    google: "google-site-verification-code",
+  },
+  category: "travel",
 }
 
 export default function RootLayout({
@@ -79,29 +92,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="it" suppressHydrationWarning>
-      <head>
-        <GoogleAnalytics />
-        <OrganizationSchema
-          name="Punti Furbi"
-          url="https://www.puntifurbi.com"
-          logo="https://www.puntifurbi.com/placeholder-logo.png"
-          socialLinks={[
-            "https://facebook.com/puntifurbi",
-            "https://twitter.com/puntifurbi",
-            "https://instagram.com/puntifurbi"
-          ]}
-        />
-        <WebsiteSchema
-          name="Punti Furbi"
-          url="https://www.puntifurbi.com"
-          description="Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!"
-        />
-      </head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-          <SiteNavigation />
-          {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="relative flex min-h-screen flex-col">
+            <SiteNavigation />
+            <main className="flex-1">{children}</main>
+          </div>
           <Toaster />
+          <GoogleAnalytics />
+          <OrganizationSchema />
+          <WebsiteSchema />
+          <DynamicBlogMetaTags />
+          <ClientCacheBuster />
         </ThemeProvider>
       </body>
     </html>

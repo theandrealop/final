@@ -1,0 +1,76 @@
+# Cache busting headers for Netlify, Vercel, and other hosting providers
+# This file should be placed in the public directory or root depending on your hosting provider
+
+# Blog routes - no cache
+/blog/*
+  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
+  Pragma: no-cache
+  Expires: 0
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  X-Cache-Busted: true
+  X-Fresh-Content: true
+
+# Static assets - long cache
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+# JavaScript and CSS files - long cache
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+# Images - long cache
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.gif
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+# Fonts - long cache
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+/*.eot
+  Cache-Control: public, max-age=31536000, immutable
+  X-Static-Asset: true
+
+# Other pages - moderate cache
+/*
+  Cache-Control: public, max-age=3600, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
