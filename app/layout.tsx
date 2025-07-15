@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Punti Furbi - Risparmia fino al 90% sui voli",
   description:
-    "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
+    "Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!",
   keywords: "voli economici, offerte volo, tariffe errore, viaggi low cost, punti furbi",
   authors: [{ name: "Punti Furbi" }],
   creator: "Punti Furbi",
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://puntifurbi.com"),
+  metadataBase: new URL("https://www.puntifurbi.com"),
   alternates: {
-    canonical: "https://puntifurbi.com/",
+    canonical: "https://www.puntifurbi.com/",
   },
   openGraph: {
     title: "Punti Furbi - Risparmia fino al 90% sui voli",
     description:
-      "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
-    url: "https://puntifurbi.com/",
+      "Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!",
+    url: "https://www.puntifurbi.com/",
     siteName: "Punti Furbi",
     locale: "it_IT",
     type: "website",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Punti Furbi - Risparmia fino al 90% sui voli",
     description:
-      "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
+      "Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!",
     creator: "@puntifurbi",
   },
   robots: {
@@ -68,8 +68,8 @@ export default function RootLayout({
         <GoogleAnalytics />
         <OrganizationSchema
           name="Punti Furbi"
-          url="https://puntifurbi.com"
-          logo="https://puntifurbi.com/placeholder-logo.png"
+          url="https://www.puntifurbi.com"
+          logo="https://www.puntifurbi.com/placeholder-logo.png"
           socialLinks={[
             "https://facebook.com/puntifurbi",
             "https://twitter.com/puntifurbi",
@@ -78,8 +78,8 @@ export default function RootLayout({
         />
         <WebsiteSchema
           name="Punti Furbi"
-          url="https://puntifurbi.com"
-          description="Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!"
+          url="https://www.puntifurbi.com"
+          description="Punti Furbi: risparmia fino al 90% sui voli con avvisi in tempo reale. Iscriviti per notifiche su tariffe errore e offerte esclusive!"
         />
       </head>
       <body className={inter.className}>
