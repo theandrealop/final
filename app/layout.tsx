@@ -2,12 +2,14 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import "../styles/light-theme-override.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { SiteNavigation } from "@/components/site-navigation"
 import { GoogleAnalytics } from "@/components/google-analytics"
 import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data"
 import { ClientCacheBuster, DynamicBlogMetaTags } from "@/components/client-cache-buster"
+import { LightThemeEnforcer } from "@/components/light-theme-enforcer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -95,8 +97,8 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <div className="relative flex min-h-screen flex-col">
@@ -109,6 +111,7 @@ export default function RootLayout({
           <WebsiteSchema />
           <DynamicBlogMetaTags />
           <ClientCacheBuster />
+          <LightThemeEnforcer />
         </ThemeProvider>
       </body>
     </html>
