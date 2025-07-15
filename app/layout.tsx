@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Punti Furbi - Risparmia fino al 90% sui voli",
   description:
-    "Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive.",
+    "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
   keywords: "voli economici, offerte volo, tariffe errore, viaggi low cost, punti furbi",
   authors: [{ name: "Punti Furbi" }],
   creator: "Punti Furbi",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Punti Furbi - Risparmia fino al 90% sui voli",
     description:
-      "Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive.",
+      "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
     url: "https://puntifurbi.com/",
     siteName: "Punti Furbi",
     locale: "it_IT",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Punti Furbi - Risparmia fino al 90% sui voli",
     description:
-      "Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive.",
+      "Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!",
     creator: "@puntifurbi",
   },
   robots: {
@@ -79,7 +79,7 @@ export default function RootLayout({
         <WebsiteSchema
           name="Punti Furbi"
           url="https://puntifurbi.com"
-          description="Scopri le migliori offerte di volo e risparmia fino al 90% sui tuoi viaggi. Notifiche in tempo reale per tariffe errore e offerte esclusive."
+          description="Punti Furbi ti aiuta a risparmiare fino al 90% sui voli con avvisi in tempo reale su tariffe errore e offerte esclusive. Iscriviti per ricevere notifiche sui migliori voli furbi!"
         />
       </head>
       <body className={inter.className}>
