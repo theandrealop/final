@@ -48,38 +48,8 @@ export function ClientCacheBuster() {
     }
   }
 
-  const handleManualRefresh = () => {
-    // Invalida tutta la cache
-    if ('caches' in window) {
-      caches.keys().then(names => {
-        names.forEach(name => caches.delete(name))
-      })
-    }
-    
-    // Rimuovi tutti i dati in cache
-    localStorage.removeItem('cache-version')
-    localStorage.removeItem('last-refresh')
-    
-    // Ricarica la pagina
-    window.location.reload()
-  }
-
-  // Ritorna null per le pagine non-blog (non renderizza nulla)
-  if (!isBlogRoute) {
-    return null
-  }
-
-  return (
-    <div className="fixed bottom-4 right-4 z-50 bg-red-500 text-white p-2 rounded shadow-lg text-xs">
-      <div>Blog Fresh Content</div>
-      <button 
-        onClick={handleManualRefresh}
-        className="mt-1 px-2 py-1 bg-red-600 rounded text-xs hover:bg-red-700"
-      >
-        Refresh Cache
-      </button>
-    </div>
-  )
+  // Il componente ora opera solo automaticamente, senza UI
+  return null
 }
 
 // Hook per gestire cache busting automatico
