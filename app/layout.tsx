@@ -6,7 +6,7 @@ import "../styles/light-theme-override.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { SiteNavigation } from "@/components/site-navigation"
-import { GoogleAnalytics } from "@/components/google-analytics"
+import { GoogleTagManager } from "@/components/google-tag-manager"
 import { OrganizationSchema, WebsiteSchema } from "@/components/structured-data"
 import { ClientCacheBuster, DynamicBlogMetaTags } from "@/components/client-cache-buster"
 import { LightThemeEnforcer } from "@/components/light-theme-enforcer"
@@ -95,6 +95,15 @@ export default function RootLayout({
   return (
     <html lang="it" suppressHydrationWarning>
       <body className={inter.className}>
+        {/* GTM noscript fallback */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-TRRBVKZR"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -106,7 +115,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
           </div>
           <Toaster />
-          <GoogleAnalytics />
+          <GoogleTagManager />
           <OrganizationSchema />
           <WebsiteSchema />
           <DynamicBlogMetaTags />

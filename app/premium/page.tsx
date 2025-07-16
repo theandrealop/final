@@ -4,9 +4,28 @@ import { useState } from "react"
 import { Menu, X, Crown, Check, Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useGoogleTagManager } from "@/components/google-tag-manager"
 
 export default function PremiumPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { trackEvent, trackPremiumSubscription } = useGoogleTagManager()
+
+  const handlePremiumClick = () => {
+    // Track premium subscription start
+    trackEvent('premium_subscription_start', {
+      subscription_plan: 'premium',
+      subscription_price: 4.90,
+      currency: 'EUR',
+      subscription_type: 'monthly'
+    })
+    
+    // Track conversion event
+    trackEvent('conversion', {
+      event_category: 'premium',
+      event_label: 'premium_subscription_click',
+      value: 4.90
+    })
+  }
 
   return (
     <div className="min-h-screen bg-cream">
@@ -106,14 +125,13 @@ export default function PremiumPage() {
                 <span className="text-left">Accesso a offerte riservate</span>
               </li>
             </ul>
-            <a 
-              href="https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01" 
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              href="/checkout?plan=premium"
+              onClick={handlePremiumClick}
               className="w-full px-8 py-4 text-lg rounded-full bg-[#483cff] text-white font-semibold hover:opacity-90 transition-opacity shadow-lg inline-block text-center"
             >
               Passa a Premium
-            </a>
+            </Link>
           </div>
         </div>
       </section>
