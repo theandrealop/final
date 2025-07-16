@@ -4,9 +4,28 @@ import { useState } from "react"
 import { Menu, X, Crown, Check, Star, Zap } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useGoogleTagManager } from "@/components/google-tag-manager"
 
 export default function ElitePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { trackEvent, trackPremiumSubscription } = useGoogleTagManager()
+
+  const handleEliteClick = () => {
+    // Track elite subscription start
+    trackEvent('elite_subscription_start', {
+      subscription_plan: 'elite',
+      subscription_price: 29.90,
+      currency: 'EUR',
+      subscription_type: 'monthly'
+    })
+    
+    // Track conversion event
+    trackEvent('conversion', {
+      event_category: 'elite',
+      event_label: 'elite_subscription_click',
+      value: 29.90
+    })
+  }
 
   return (
     <div className="min-h-screen bg-cream">
@@ -102,14 +121,13 @@ export default function ElitePage() {
                 <span className="text-left">Consigli su status, carte e strategie travel hacking</span>
               </li>
             </ul>
-            <a 
-              href="https://buy.stripe.com/28EdRachK3xI1PC2b19AA02" 
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link 
+              href="/checkout?plan=elite"
+              onClick={handleEliteClick}
               className="w-full px-8 py-4 text-lg rounded-full bg-white text-[#483cff] font-semibold hover:bg-gray-100 transition-colors shadow-lg inline-block text-center"
             >
               Diventa Elite
-            </a>
+            </Link>
           </div>
         </div>
       </section>
