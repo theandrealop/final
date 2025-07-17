@@ -4,13 +4,28 @@ Allow: /
 # Sitemap
 Sitemap: https://puntifurbi.com/sitemap.xml
 
-# Disallow admin pages if they exist
+# Disallow admin and API pages
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_next/
+Disallow: /test-registration/
 
-# Allow important pages
+# Allow important pages for explicit crawling
 Allow: /voli-economici/
 Allow: /blog/
 Allow: /come-funziona/
 Allow: /premium/
 Allow: /elite/
+Allow: /checkout/
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Specific rules for major bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
