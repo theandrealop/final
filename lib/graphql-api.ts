@@ -1,3 +1,5 @@
+import { fetchGraphQLWithRetry, getFallbackBlogData } from './fetch-with-retry'
+
 const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL || "https://pff-815f04.ingress-florina.ewp.live/graphql"
 
 export interface BlogPost {
@@ -76,87 +78,46 @@ export async function getAllPosts(first = 10, after?: string): Promise<Paginated
     }
   `
 
-  const data = await fetchGraphQL(query, { first, after })
-  
-  if (!data || !data.posts) {
-    console.error("No posts data received")
+  try {
+    console.log("🚀 getAllPosts: Iniziando fetch con retry logic...")
+    const data = await fetchGraphQLWithRetry(WORDPRESS_API_URL, query, { first, after })
+    
+    if (!data || !data.posts) {
+      console.warn("⚠️ No posts data received, usando fallback")
+      const fallbackData = getFallbackBlogData()
+      return {
+        posts: fallbackData.posts.nodes,
+        hasNextPage: fallbackData.posts.pageInfo.hasNextPage,
+        endCursor: fallbackData.posts.pageInfo.endCursor,
+      }
+    }
+
+    // Sort posts by date (most recent first) on client side
+    const posts = (data.posts.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime()
+    })
+
+    console.log(`✅ getAllPosts: ${posts.length} posts caricati con successo`)
     return {
-      posts: [],
+      posts,
+      hasNextPage: data.posts.pageInfo?.hasNextPage || false,
+      endCursor: data.posts.pageInfo?.endCursor || null,
+    }
+  } catch (error) {
+    console.error("💥 getAllPosts: Errore durante fetch, usando fallback:", error)
+    const fallbackData = getFallbackBlogData()
+    return {
+      posts: fallbackData.posts.nodes,
       hasNextPage: false,
       endCursor: null,
     }
   }
-
-  // Sort posts by date (most recent first) on client side
-  const posts = (data.posts.nodes || []).sort((a: BlogPost, b: BlogPost) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime()
-  })
-
-  return {
-    posts,
-    hasNextPage: data.posts.pageInfo?.hasNextPage || false,
-    endCursor: data.posts.pageInfo?.endCursor || null,
-  }
 }
 
+// Deprecata: ora usiamo fetchGraphQLWithRetry
 async function fetchGraphQL(query: string, variables: any = {}) {
-  console.log("🔍 Fetching from:", WORDPRESS_API_URL)
-  
-  try {
-    const response = await fetch(WORDPRESS_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-        "Expires": "0"
-      },
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
-      next: { revalidate: 60 }, // Cache for 1 minute - faster updates for new posts
-    })
-
-    console.log("📡 Response status:", response.status)
-
-    if (!response.ok) {
-      console.error("❌ HTTP error! status:", response.status)
-      // Try to get the response text to see what we received
-      const text = await response.text()
-      console.error("❌ Response body:", text.substring(0, 200) + "...")
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const text = await response.text()
-    
-    // Check if response is HTML (error page) instead of JSON
-    if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-      console.error("❌ Received HTML instead of JSON:", text.substring(0, 200) + "...")
-      throw new Error("GraphQL endpoint returned HTML instead of JSON - check your WordPress API URL")
-    }
-
-    let json
-    try {
-      json = JSON.parse(text)
-    } catch (parseError) {
-      console.error("❌ JSON parse error:", parseError)
-      console.error("❌ Raw response:", text.substring(0, 200) + "...")
-      throw new Error("Invalid JSON response from GraphQL endpoint")
-    }
-    
-    console.log("📄 Response received:", json.data ? "✅ Data found" : "❌ No data")
-
-    if (json.errors) {
-      console.error("❌ GraphQL errors:", json.errors)
-      throw new Error("GraphQL query failed: " + JSON.stringify(json.errors))
-    }
-
-    return json.data
-  } catch (error) {
-    console.error("💥 GraphQL fetch error:", error)
-    throw error
-  }
+  console.log("⚠️ DEPRECATO: Uso fetchGraphQLWithRetry invece di fetchGraphQL")
+  return await fetchGraphQLWithRetry(WORDPRESS_API_URL, query, variables)
 }
 
 export async function getBlogPosts(first = 10): Promise<BlogPost[]> {
@@ -192,15 +153,26 @@ export async function getBlogPosts(first = 10): Promise<BlogPost[]> {
   `
 
   try {
-    const data = await fetchGraphQL(query, { first })
+    console.log("🚀 getBlogPosts: Iniziando fetch con retry logic...")
+    const data = await fetchGraphQLWithRetry(WORDPRESS_API_URL, query, { first })
+    
+    if (!data?.posts?.nodes) {
+      console.warn("⚠️ getBlogPosts: No posts data, usando fallback")
+      const fallbackData = getFallbackBlogData()
+      return fallbackData.posts.nodes
+    }
+    
     // Sort posts by date (most recent first) on client side
-    const posts = (data?.posts?.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+    const posts = data.posts.nodes.sort((a: BlogPost, b: BlogPost) => {
       return new Date(b.date).getTime() - new Date(a.date).getTime()
     })
+    
+    console.log(`✅ getBlogPosts: ${posts.length} posts caricati con successo`)
     return posts
   } catch (error) {
-    console.error("Error fetching blog posts:", error)
-    return []
+    console.error("💥 getBlogPosts: Errore durante fetch, usando fallback:", error)
+    const fallbackData = getFallbackBlogData()
+    return fallbackData.posts.nodes
   }
 }
 
@@ -242,10 +214,18 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   `
 
   try {
-    const data = await fetchGraphQL(query, { slug })
-    return data?.post || null
+    console.log(`🚀 getPostBySlug: Caricando post "${slug}" con retry logic...`)
+    const data = await fetchGraphQLWithRetry(WORDPRESS_API_URL, query, { slug })
+    
+    if (data?.post) {
+      console.log(`✅ getPostBySlug: Post "${slug}" caricato con successo`)
+      return data.post
+    }
+    
+    console.warn(`⚠️ getPostBySlug: Post "${slug}" non trovato`)
+    return null
   } catch (error) {
-    console.error(`Error fetching post with slug ${slug}:`, error)
+    console.error(`💥 getPostBySlug: Errore caricamento post "${slug}":`, error)
     return null
   }
 }
@@ -292,18 +272,18 @@ export async function getRelatedPosts(categories: any[]): Promise<any[]> {
       categoryId: categoryIds[0]
     }
 
-    console.log('🔍 Fetching related posts for category:', categoryIds[0])
-    const data = await fetchGraphQL(query, variables)
+    console.log('🚀 getRelatedPosts: Caricando post correlati con retry logic per categoria:', categoryIds[0])
+    const data = await fetchGraphQLWithRetry(WORDPRESS_API_URL, query, variables)
     
     if (data?.category?.posts?.nodes) {
-      console.log('✅ Related posts found:', data.category.posts.nodes.length)
+      console.log('✅ getRelatedPosts: Post correlati trovati:', data.category.posts.nodes.length)
       return data.category.posts.nodes
     }
     
-    console.log('❌ No related posts found')
+    console.log('⚠️ getRelatedPosts: Nessun post correlato trovato')
     return []
   } catch (error) {
-    console.error('💥 Error fetching related posts:', error)
+    console.error('💥 getRelatedPosts: Errore caricamento post correlati:', error)
     return []
   }
 }

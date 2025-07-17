@@ -4,6 +4,7 @@ import { useState } from "react"
 import type { BlogPost } from "@/lib/graphql-api"
 import { BlogCard } from "./blog-card"
 import { Button } from "@/components/ui/button"
+import { fetchGraphQLWithRetry } from "@/lib/fetch-with-retry"
 
 interface BlogListProps {
   initialPosts: BlogPost[]
@@ -26,7 +27,9 @@ export function BlogList({
 
     setLoading(true)
     try {
-      // Client-side GraphQL fetch without Next.js specific options
+      console.log("🚀 BlogList: Caricando più posts con retry logic...")
+      
+      // Client-side GraphQL fetch con retry logic
       const WORDPRESS_API_URL = "https://pff-815f04.ingress-florina.ewp.live/graphql"
       
       const query = `
@@ -50,33 +53,29 @@ export function BlogList({
         }
       `
 
-      const response = await fetch(WORDPRESS_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          query,
-          variables: { first: 12, after: endCursor }
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const json = await response.json()
+      // Usa il nuovo sistema di retry
+      const data = await fetchGraphQLWithRetry(
+        WORDPRESS_API_URL,
+        query,
+        { first: 12, after: endCursor },
+        {
+          maxRetries: 3, // Meno retry per load more
+          baseDelay: 1000,
+          maxDelay: 10000
+        }
+      )
       
-      if (json.errors) {
-        throw new Error("GraphQL query failed: " + JSON.stringify(json.errors))
+      if (!data?.posts?.nodes) {
+        console.warn("⚠️ BlogList: Nessun dato ricevuto per load more")
+        return
       }
-
-      const data = json.data
       
       // Sort new posts by date (most recent first)
-      const newPosts = (data.posts.nodes || []).sort((a: BlogPost, b: BlogPost) => {
+      const newPosts = data.posts.nodes.sort((a: BlogPost, b: BlogPost) => {
         return new Date(b.date).getTime() - new Date(a.date).getTime()
       })
+      
+      console.log(`✅ BlogList: Caricati ${newPosts.length} nuovi posts`)
       
       setPosts((prevPosts: BlogPost[]) => {
         const combined = [...prevPosts, ...newPosts]
@@ -88,7 +87,15 @@ export function BlogList({
       setHasNextPage(data.posts.pageInfo?.hasNextPage || false)
       setEndCursor(data.posts.pageInfo?.endCursor || null)
     } catch (error) {
-      console.error("Error loading more posts:", error)
+      console.error("💥 BlogList: Errore caricamento più posts:", error)
+      
+      // Gestione errori specifici per l'utente
+      if (error instanceof Error) {
+        if (error.message.includes('429') || error.message.includes('rate limit')) {
+          console.log("🚫 Rate limiting rilevato, disabilito temporaneamente il load more")
+          // Potresti disabilitare temporaneamente il pulsante qui
+        }
+      }
     } finally {
       setLoading(false)
     }
