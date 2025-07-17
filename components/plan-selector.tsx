@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Crown, Zap, Check } from "lucide-react"
 import { pricingPlans, formatPrice, type PricingPlan } from "@/lib/pricing"
 import { cn } from "@/lib/utils"
@@ -24,6 +24,11 @@ export function PlanSelector({
     setInterval(newInterval)
     onBillingChange?.(newInterval)
   }
+
+  // Sync with external billing interval changes
+  useEffect(() => {
+    setInterval(billingInterval)
+  }, [billingInterval])
 
   const getDisplayPrice = (plan: PricingPlan) => {
     return interval === 'year' ? plan.yearlyPrice || plan.price * 12 : plan.price
