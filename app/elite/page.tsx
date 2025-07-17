@@ -11,10 +11,10 @@ export default function ElitePage() {
   const { trackEvent, trackPremiumSubscription } = useGoogleTagManager()
 
   const handleEliteClick = () => {
-    // Track elite subscription start
+    // Track elite subscription start - CORRECTED PRICE
     trackEvent('elite_subscription_start', {
       subscription_plan: 'elite',
-      subscription_price: 29.90,
+      subscription_price: 19.90, // CORRECTED: was 29.90
       currency: 'EUR',
       subscription_type: 'monthly'
     })
@@ -23,7 +23,7 @@ export default function ElitePage() {
     trackEvent('conversion', {
       event_category: 'elite',
       event_label: 'elite_subscription_click',
-      value: 29.90
+      value: 19.90 // CORRECTED: was 29.90
     })
   }
 

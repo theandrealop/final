@@ -1,120 +1,148 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
-// Forza la pagina a essere dinamica per evitare errori di prerendering
-export const dynamic = 'force-dynamic'
 import { Crown, Check, Star, Zap, ArrowLeft, CreditCard, Shield, Clock } from "lucide-react"
 import Link from "next/link"
 import { useGoogleTagManager } from "@/components/google-tag-manager"
 import { useSearchParams } from "next/navigation"
+import { PRICING_CONFIG, PlanType, BillingType, getPlanPrice, getPlanFeatures } from "@/lib/pricing"
+
+// Force dynamic rendering to avoid prerendering errors
+export const dynamic = 'force-dynamic'
 
 export default function CheckoutPage() {
-  const [selectedPlan, setSelectedPlan] = useState('premium')
+  const [selectedPlan, setSelectedPlan] = useState<PlanType>('premium')
+  const [selectedBilling, setSelectedBilling] = useState<BillingType>('monthly')
+  const [isLoading, setIsLoading] = useState(false)
   const { trackEvent, trackPageView } = useGoogleTagManager()
   const searchParams = useSearchParams()
-
-  const plans = {
-    premium: {
-      name: 'Premium',
-      price: 4.90,
-      yearlyPrice: 49.90,
-      stripeLink: 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01',
-      features: [
-        'Tutte le offerte Economy e Premium Economy',
-        'Offerte esclusive in Business e First Class',
-        'Segnalazioni di tariffe error fare premium',
-        'Supporto via email prioritario',
-        'Accesso a offerte riservate'
-      ],
-      color: '#483cff'
-    },
-    elite: {
-      name: 'Elite',
-      price: 29.90,
-      yearlyPrice: 299.90,
-      stripeLink: 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02',
-      features: [
-        'Tutto il piano Premium',
-        'Concierge personale',
-        'Servizi premium di travel hacking',
-        'Ricerca personalizzata con punti e miglia',
-        '1 consulenza personalizzata al mese',
-        'Accesso anticipato a tutte le offerte',
-        'Consigli su status, carte e strategie travel hacking'
-      ],
-      color: '#483cff'
-    }
-  }
 
   useEffect(() => {
     // Track page view
     trackPageView('/checkout', 'Checkout - Punti Furbi')
     
-    // Track checkout initiation
+    // Get plan and billing from URL if provided
+    const planParam = searchParams.get('plan') as PlanType
+    const billingParam = searchParams.get('billing') as BillingType
+    
+    if (planParam && PRICING_CONFIG[planParam]) {
+      setSelectedPlan(planParam)
+    }
+    
+    if (billingParam && (billingParam === 'monthly' || billingParam === 'yearly')) {
+      setSelectedBilling(billingParam)
+    }
+  }, [searchParams, trackPageView])
+
+  useEffect(() => {
+    // Track checkout initiation when plan changes
+    const currentPrice = getPlanPrice(selectedPlan, selectedBilling)
     trackEvent('begin_checkout', {
       currency: 'EUR',
-      value: plans[selectedPlan].price,
+      value: currentPrice.price,
       items: [{
-        item_id: selectedPlan,
-        item_name: `Punti Furbi ${plans[selectedPlan].name}`,
-        price: plans[selectedPlan].price,
+        item_id: `${selectedPlan}_${selectedBilling}`,
+        item_name: `Punti Furbi ${PRICING_CONFIG[selectedPlan].name} (${selectedBilling})`,
+        price: currentPrice.price,
         quantity: 1
       }]
     })
+  }, [selectedPlan, selectedBilling, trackEvent])
 
-    // Get plan from URL if provided
-    const plan = searchParams.get('plan')
-    if (plan && plans[plan]) {
-      setSelectedPlan(plan)
-    }
-  }, [selectedPlan, searchParams, trackEvent, trackPageView])
-
-  const handlePlanChange = (plan: string) => {
+  const handlePlanChange = (plan: PlanType) => {
+    const previousPlan = selectedPlan
     setSelectedPlan(plan)
     
     // Track plan selection
     trackEvent('checkout_plan_change', {
-      previous_plan: selectedPlan,
+      previous_plan: previousPlan,
       new_plan: plan,
+      billing: selectedBilling,
       currency: 'EUR',
-      value: plans[plan].price
+      value: getPlanPrice(plan, selectedBilling).price
     })
   }
 
-  const handleCheckout = () => {
-    const plan = plans[selectedPlan]
+  const handleBillingChange = (billing: BillingType) => {
+    const previousBilling = selectedBilling
+    setSelectedBilling(billing)
     
-    // Track conversion/purchase intent
-    trackEvent('purchase_intent', {
+    // Track billing change
+    trackEvent('checkout_billing_change', {
+      plan: selectedPlan,
+      previous_billing: previousBilling,
+      new_billing: billing,
       currency: 'EUR',
-      value: plan.price,
-      transaction_id: `${selectedPlan}_${Date.now()}`,
-      items: [{
-        item_id: selectedPlan,
-        item_name: `Punti Furbi ${plan.name}`,
-        price: plan.price,
-        quantity: 1
-      }]
-    })
-
-    // Track specific subscription events
-    trackEvent(`${selectedPlan}_subscription_start`, {
-      subscription_plan: selectedPlan,
-      subscription_price: plan.price,
-      currency: 'EUR',
-      subscription_type: 'monthly'
-    })
-
-    // Track conversion
-    trackEvent('conversion', {
-      event_category: selectedPlan,
-      event_label: `${selectedPlan}_subscription_click`,
-      value: plan.price
+      value: getPlanPrice(selectedPlan, billing).price
     })
   }
 
-  const currentPlan = plans[selectedPlan]
+  const handleCheckout = async () => {
+    setIsLoading(true)
+    
+    try {
+      const currentPrice = getPlanPrice(selectedPlan, selectedBilling)
+      
+      // Track conversion/purchase intent
+      trackEvent('purchase_intent', {
+        currency: 'EUR',
+        value: currentPrice.price,
+        transaction_id: `${selectedPlan}_${selectedBilling}_${Date.now()}`,
+        items: [{
+          item_id: `${selectedPlan}_${selectedBilling}`,
+          item_name: `Punti Furbi ${PRICING_CONFIG[selectedPlan].name} (${selectedBilling})`,
+          price: currentPrice.price,
+          quantity: 1
+        }]
+      })
+
+      // Track specific subscription events
+      trackEvent(`${selectedPlan}_subscription_start`, {
+        subscription_plan: selectedPlan,
+        subscription_price: currentPrice.price,
+        currency: 'EUR',
+        subscription_type: selectedBilling
+      })
+
+      // Track conversion
+      trackEvent('conversion', {
+        event_category: selectedPlan,
+        event_label: `${selectedPlan}_${selectedBilling}_subscription_click`,
+        value: currentPrice.price
+      })
+
+      // Create Stripe checkout session
+      const response = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          plan: selectedPlan,
+          billing: selectedBilling,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session')
+      }
+
+      // Redirect to Stripe checkout
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch (error) {
+      console.error('Checkout error:', error)
+      alert('Si è verificato un errore. Riprova tra poco.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const currentPrice = getPlanPrice(selectedPlan, selectedBilling)
+  const currentFeatures = getPlanFeatures(selectedPlan)
 
   return (
     <div className="min-h-screen bg-cream">
@@ -146,62 +174,107 @@ export default function CheckoutPage() {
         </div>
 
         {/* Plan Selection */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          {Object.entries(plans).map(([key, plan]) => (
-            <div 
-              key={key}
-              className={`bg-white rounded-lg p-6 shadow-lg cursor-pointer transition-all ${
-                selectedPlan === key ? 'ring-2 ring-blue-500 border-blue-500' : 'border border-gray-200'
-              }`}
-              onClick={() => handlePlanChange(key)}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-2">
-                  {key === 'premium' ? (
-                    <Crown className="text-[#483cff]" size={24} />
-                  ) : (
-                    <Zap className="text-[#483cff]" size={24} />
-                  )}
-                  <h3 className="text-xl font-bold text-dark-green">{plan.name}</h3>
+        <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
+          <h3 className="text-xl font-bold text-dark-green mb-6">Seleziona il tuo piano</h3>
+          
+          {/* Plan Selector */}
+          <div className="grid md:grid-cols-2 gap-4 mb-6">
+            {(Object.keys(PRICING_CONFIG) as PlanType[]).map((planKey) => {
+              const plan = PRICING_CONFIG[planKey]
+              const IconComponent = planKey === 'premium' ? Crown : Zap
+              const isSelected = selectedPlan === planKey
+              
+              return (
+                <div
+                  key={planKey}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                    isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => handlePlanChange(planKey)}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <IconComponent className="text-[#483cff]" size={20} />
+                      <h4 className="font-semibold text-dark-green">{plan.name}</h4>
+                    </div>
+                    <input
+                      type="radio"
+                      name="plan"
+                      checked={isSelected}
+                      onChange={() => handlePlanChange(planKey)}
+                      className="w-4 h-4 text-blue-600"
+                    />
+                  </div>
+                  <div className="text-lg font-bold text-[#483cff]">
+                    €{plan[selectedBilling].price}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {selectedBilling === 'monthly' ? 'al mese' : 'all\'anno'}
+                  </div>
                 </div>
+              )
+            })}
+          </div>
+
+          {/* Billing Frequency Selector */}
+          <div className="mb-6">
+            <h4 className="font-semibold text-dark-green mb-3">Frequenza di fatturazione</h4>
+            <div className="flex space-x-4">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="radio"
-                  name="plan"
-                  checked={selectedPlan === key}
-                  onChange={() => handlePlanChange(key)}
-                  className="w-4 h-4 text-blue-600"
+                  name="billing"
+                  value="monthly"
+                  checked={selectedBilling === 'monthly'}
+                  onChange={() => handleBillingChange('monthly')}
+                  className="w-4 h-4 text-blue-600 mr-2"
                 />
-              </div>
-              <div className="text-2xl font-bold text-[#483cff] mb-2">
-                €{plan.price}
-              </div>
-              <div className="text-sm text-gray-600 mb-4">al mese</div>
-              <ul className="space-y-2">
-                {plan.features.slice(0, 3).map((feature, idx) => (
-                  <li key={idx} className="flex items-center text-sm">
-                    <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-                {plan.features.length > 3 && (
-                  <li className="text-sm text-gray-500">
-                    +{plan.features.length - 3} altre funzionalità
-                  </li>
+                <span className="text-gray-700">Mensile</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="billing"
+                  value="yearly"
+                  checked={selectedBilling === 'yearly'}
+                  onChange={() => handleBillingChange('yearly')}
+                  className="w-4 h-4 text-blue-600 mr-2"
+                />
+                <span className="text-gray-700">Annuale</span>
+                {selectedBilling === 'yearly' && (
+                  <span className="text-sm text-green-600 ml-2 font-medium">
+                    (Risparmia {Math.round((1 - (getPlanPrice(selectedPlan, 'yearly').price / (getPlanPrice(selectedPlan, 'monthly').price * 12))) * 100)}%)
+                  </span>
                 )}
-              </ul>
+              </label>
             </div>
-          ))}
+          </div>
+
+          {/* Selected Plan Features */}
+          <div className="border-t pt-4">
+            <h4 className="font-semibold text-dark-green mb-3">Cosa include il piano {PRICING_CONFIG[selectedPlan].name}:</h4>
+            <ul className="space-y-2">
+              {currentFeatures.map((feature, idx) => (
+                <li key={idx} className="flex items-center text-sm">
+                  <Check className="text-green-500 mr-2 flex-shrink-0" size={16} />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* Selected Plan Details */}
+        {/* Order Summary */}
         <div className="bg-white rounded-lg p-6 shadow-lg mb-8">
           <h3 className="text-xl font-bold text-dark-green mb-4">
-            Riepilogo ordine: {currentPlan.name}
+            Riepilogo ordine
           </h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Piano mensile</span>
-              <span className="font-semibold">€{currentPlan.price}</span>
+              <span className="text-gray-600">
+                {PRICING_CONFIG[selectedPlan].name} ({selectedBilling === 'monthly' ? 'Mensile' : 'Annuale'})
+              </span>
+              <span className="font-semibold">€{currentPrice.price}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-600">IVA (22%)</span>
@@ -210,7 +283,7 @@ export default function CheckoutPage() {
             <div className="border-t pt-4">
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Totale</span>
-                <span className="text-[#483cff]">€{currentPlan.price}</span>
+                <span className="text-[#483cff]">€{currentPrice.price}</span>
               </div>
             </div>
           </div>
@@ -237,16 +310,14 @@ export default function CheckoutPage() {
 
         {/* Checkout Button */}
         <div className="text-center">
-          <a
-            href={currentPlan.stripeLink}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
             onClick={handleCheckout}
-            className="inline-flex items-center justify-center w-full max-w-md px-8 py-4 text-lg rounded-full bg-[#483cff] text-white font-semibold hover:opacity-90 transition-opacity shadow-lg"
+            disabled={isLoading}
+            className="inline-flex items-center justify-center w-full max-w-md px-8 py-4 text-lg rounded-full bg-[#483cff] text-white font-semibold hover:opacity-90 transition-opacity shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <CreditCard className="mr-2" size={20} />
-            Procedi al pagamento
-          </a>
+            {isLoading ? 'Caricamento...' : 'Procedi al pagamento'}
+          </button>
           <p className="text-sm text-gray-600 mt-4">
             Verrai reindirizzato a Stripe per completare il pagamento
           </p>
