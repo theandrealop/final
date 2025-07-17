@@ -16,9 +16,9 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: 'premium',
     name: 'Premium',
-    priceId: 'price_1RkqssLhwgrXzl4cMXVOdKdW',
+    priceId: 'price_1RkqssLhwgrXzl4cMXVOdKdW', // Monthly Premium
     price: 4.90,
-    yearlyPriceId: '', // Da aggiungere se disponibile
+    yearlyPriceId: 'price_1RkqssLhwgrXzl4cMXVOdKdW_yearly', // Yearly Premium - da aggiornare con ID reale
     yearlyPrice: 49.90,
     currency: 'EUR',
     interval: 'month',
@@ -34,10 +34,10 @@ export const pricingPlans: PricingPlan[] = [
   {
     id: 'elite',
     name: 'Elite',
-    priceId: 'price_1RkqssLhwgrXzl4cHffnRCCn',
-    price: 19.90, // CORRETTO: era 29.90
-    yearlyPriceId: '', // Da aggiungere se disponibile
-    yearlyPrice: 199.90, // CORRETTO: era 299.90
+    priceId: 'price_1RkqssLhwgrXzl4cHffnRCCn', // Monthly Elite
+    price: 19.90,
+    yearlyPriceId: 'price_1RkqssLhwgrXzl4cHffnRCCn_yearly', // Yearly Elite - da aggiornare con ID reale
+    yearlyPrice: 199.90,
     currency: 'EUR',
     interval: 'month',
     features: [
@@ -62,6 +62,14 @@ export const getPlanByPriceId = (priceId: string): PricingPlan | undefined => {
   return pricingPlans.find(plan => plan.priceId === priceId || plan.yearlyPriceId === priceId)
 }
 
+// Helper per ottenere il priceId corretto in base all'intervallo di fatturazione
+export const getPriceIdForInterval = (planId: string, interval: 'month' | 'year'): string | undefined => {
+  const plan = getPlanById(planId)
+  if (!plan) return undefined
+  
+  return interval === 'year' ? (plan.yearlyPriceId || plan.priceId) : plan.priceId
+}
+
 // Helper per formattare i prezzi
 export const formatPrice = (price: number, currency: string = 'EUR'): string => {
   return new Intl.NumberFormat('it-IT', {
@@ -83,8 +91,8 @@ export const legacyPlansConfig = {
   },
   elite: {
     name: 'Elite',
-    price: 19.90, // CORRETTO
-    yearlyPrice: 199.90, // CORRETTO
+    price: 19.90,
+    yearlyPrice: 199.90,
     features: pricingPlans[1].features,
     color: '#483cff'
   }

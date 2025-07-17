@@ -1,36 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPlanByPriceId } from '@/lib/pricing'
+import { getPlanByPriceId, getPlanById, getPriceIdForInterval } from '@/lib/pricing'
 
 // Stripe webhook endpoint per creare sessioni di checkout dinamiche
 export async function POST(request: NextRequest) {
   try {
-    const { priceId, successUrl, cancelUrl } = await request.json()
+    const { priceId, planId, billingInterval = 'month', successUrl, cancelUrl } = await request.json()
 
     // Validazione input
-    if (!priceId) {
+    if (!priceId && !planId) {
       return NextResponse.json(
-        { error: 'Price ID è richiesto' },
+        { error: 'Price ID o Plan ID è richiesto' },
         { status: 400 }
       )
     }
 
-    // Verifica che il priceId sia valido
-    const plan = getPlanByPriceId(priceId)
-    if (!plan) {
-      return NextResponse.json(
-        { error: 'Piano non valido' },
-        { status: 400 }
-      )
+    let plan
+    let finalPriceId = priceId
+
+    // Se abbiamo planId e billingInterval, otteniamo il priceId corretto
+    if (planId && billingInterval) {
+      plan = getPlanById(planId)
+      if (!plan) {
+        return NextResponse.json(
+          { error: 'Piano non valido' },
+          { status: 400 }
+        )
+      }
+      
+      // Ottieni il priceId corretto per l'intervallo di fatturazione
+      finalPriceId = getPriceIdForInterval(planId, billingInterval)
+      if (!finalPriceId) {
+        return NextResponse.json(
+          { error: 'Prezzo non disponibile per questo intervallo di fatturazione' },
+          { status: 400 }
+        )
+      }
+    } else {
+      // Verifica che il priceId sia valido
+      plan = getPlanByPriceId(finalPriceId)
+      if (!plan) {
+        return NextResponse.json(
+          { error: 'Piano non valido' },
+          { status: 400 }
+        )
+      }
     }
 
     // Per ora restituiamo i link Stripe esistenti
     // TODO: Implementare Stripe SDK quando si hanno le API keys
     const stripeLinks = {
-      'price_1RkqssLhwgrXzl4cMXVOdKdW': 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01', // Premium
-      'price_1RkqssLhwgrXzl4cHffnRCCn': 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02', // Elite
+      'price_1RkqssLhwgrXzl4cMXVOdKdW': 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01', // Premium Monthly
+      'price_1RkqssLhwgrXzl4cHffnRCCn': 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02', // Elite Monthly
+      'price_1RkqssLhwgrXzl4cMXVOdKdW_yearly': 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01', // Premium Yearly (stesso link per ora)
+      'price_1RkqssLhwgrXzl4cHffnRCCn_yearly': 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02', // Elite Yearly (stesso link per ora)
     }
 
-    const checkoutUrl = stripeLinks[priceId as keyof typeof stripeLinks]
+    const checkoutUrl = stripeLinks[finalPriceId as keyof typeof stripeLinks]
     
     if (!checkoutUrl) {
       return NextResponse.json(
@@ -39,11 +64,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Calcola il prezzo corretto in base all'intervallo
+    const price = billingInterval === 'year' ? plan.yearlyPrice || plan.price * 12 : plan.price
+
     return NextResponse.json({
       url: checkoutUrl,
       planName: plan.name,
-      price: plan.price,
-      currency: plan.currency
+      price: price,
+      currency: plan.currency,
+      billingInterval: billingInterval
     })
 
   } catch (error) {

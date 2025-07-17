@@ -115,7 +115,8 @@ export default function CheckoutPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          priceId: currentPlan.priceId,
+          planId: selectedPlan,
+          billingInterval: billingInterval,
           successUrl: `${window.location.origin}/success`,
           cancelUrl: `${window.location.origin}/checkout`
         }),
@@ -123,23 +124,32 @@ export default function CheckoutPage() {
 
       const data = await response.json()
       
+      if (!response.ok) {
+        throw new Error(data.error || 'Errore durante la creazione della sessione')
+      }
+      
       if (data.url) {
         // Redirect a Stripe
         window.location.href = data.url
       } else {
-        console.error('Errore checkout:', data.error)
+        console.error('Errore checkout: URL non disponibile')
         // Fallback al link diretto per ora
         const fallbackLinks = {
-          'price_1RkqssLhwgrXzl4cMXVOdKdW': 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01',
-          'price_1RkqssLhwgrXzl4cHffnRCCn': 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02'
+          'premium': billingInterval === 'year' 
+            ? 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01' // Premium Yearly
+            : 'https://buy.stripe.com/5kQfZi1D69W6cug5nd9AA01', // Premium Monthly
+          'elite': billingInterval === 'year'
+            ? 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02' // Elite Yearly
+            : 'https://buy.stripe.com/28EdRachK3xI1PC2b19AA02'  // Elite Monthly
         }
-        const fallbackUrl = fallbackLinks[currentPlan.priceId as keyof typeof fallbackLinks]
+        const fallbackUrl = fallbackLinks[selectedPlan as keyof typeof fallbackLinks]
         if (fallbackUrl) {
           window.open(fallbackUrl, '_blank')
         }
       }
     } catch (error) {
       console.error('Errore durante il checkout:', error)
+      alert('Si è verificato un errore durante il checkout. Riprova tra qualche istante.')
     } finally {
       setIsLoading(false)
     }
